@@ -16,18 +16,37 @@
 
 > 说明：功能安全（ISO 26262 / ASPICE）与 BMS 强相关，已在 `iso26262-aspice-bms-guide` 单独成册，本仓库仅在系统架构章节做必要衔接，不重复展开。
 
-## 章节目录（8 章，每章 ≥1000 字）
+## 章节目录（8 章，合计约 16000 行 / 71 万字符）
 
-| 章节 | 文件 | 主题 |
-|------|------|------|
-| 一、环境感知 | [chapters/ch01-perception.md](chapters/ch01-perception.md) | 摄像头/LiDAR/Radar 目标检测与语义分割 |
-| 二、多传感器融合 | [chapters/ch02-sensor-fusion.md](chapters/ch02-sensor-fusion.md) | 卡尔曼族滤波（KF/EKF/UKF）、粒子滤波、多目标跟踪 |
-| 三、定位与高精地图 | [chapters/ch03-localization-mapping.md](chapters/ch03-localization-mapping.md) | GNSS/IMU/LiDAR SLAM 与 OpenDRIVE 高精地图 |
-| 四、行为决策 | [chapters/ch04-behavior-decision.md](chapters/ch04-behavior-decision.md) | 有限状态机 / 博弈 / 强化学习决策 |
-| 五、运动规划 | [chapters/ch05-motion-planning.md](chapters/ch05-motion-planning.md) | A* / RRT* / Lattice 与轨迹优化 |
-| 六、车辆控制 | [chapters/ch06-vehicle-control.md](chapters/ch06-vehicle-control.md) | PID / LQR / MPC 与车辆动力学 |
-| 七、端到端智驾 | [chapters/ch07-end2end.md](chapters/ch07-end2end.md) | BEV / Transformer / Occupancy 网络 |
-| 八、系统架构与中间件 | [chapters/ch08-system-architecture.md](chapters/ch08-system-architecture.md) | ROS2 / DDS / 计算平台(Orin) / 冗余架构 |
+每章都不是提纲式速记，而是**能当教材读、当面试稿背、当工程手册查**的长文：公式真推导、mermaid 架构图、多张对比表格、**实际跑过并把真实输出贴回文档**的 Python 代码、12–14 条"现象→原因→对策"踩坑清单、14–16 道带实质答案的面试题。
+
+| 章节 | 文件 | 主题 | 篇幅 |
+|------|------|------|------|
+| 一、环境感知 | [chapters/ch01-perception.md](chapters/ch01-perception.md) | 摄像头成像与 ISP、LiDAR 点云、毫米波 FMCW 与 CFAR、三类传感器全维度对比 | 826 行 |
+| 二、多传感器融合 | [chapters/ch02-sensor-fusion.md](chapters/ch02-sensor-fusion.md) | 时空对齐与标定、KF/EKF/UKF 推导、IMM、多目标跟踪与数据关联 | 1942 行 |
+| 三、定位与高精地图 | [chapters/ch03-localization-mapping.md](chapters/ch03-localization-mapping.md) | GNSS/RTK、IMU 误差模型与 Allan 方差、ESKF 组合导航、OpenDRIVE | 1596 行 |
+| 四、行为决策 | [chapters/ch04-behavior-decision.md](chapters/ch04-behavior-decision.md) | 轨迹预测、FSM/行为树、POMDP、博弈论、RSS 安全形式化 | 1773 行 |
+| 五、运动规划 | [chapters/ch05-motion-planning.md](chapters/ch05-motion-planning.md) | Frenet 坐标系、Hybrid A\*、Lattice 采样、ST 图与 QP 轨迹优化 | 2091 行 |
+| 六、车辆控制 | [chapters/ch06-vehicle-control.md](chapters/ch06-vehicle-control.md) | 车辆动力学、Pure Pursuit/Stanley/LQR/MPC 四法对比、延时补偿与标定 | 2650 行 |
+| 七、端到端智驾 | [chapters/ch07-end2end.md](chapters/ch07-end2end.md) | BEV（LSS/BEVFormer）、Occupancy、UniAD/VAD、世界模型与 VLA | 1767 行 |
+| 八、系统架构与中间件 | [chapters/ch08-system-architecture.md](chapters/ch08-system-architecture.md) | E/E 架构演进、车载网络、AUTOSAR 双栈、时间同步与功能安全冗余 | 3359 行 |
+
+## 配套可运行代码
+
+`code/` 目录是各章"工程实践"小节里**真实运行过**的验证脚本（纯 Python + numpy，不需要车载环境）。文档中引用的每一个实验数字都来自这些脚本的输出，不是编造的。
+
+| 脚本 | 章节 | 做什么 |
+|------|------|--------|
+| `lidar_pipeline.py` | ch01 | 体素降采样 → RANSAC 地面剔除 → 欧式聚类 → PCA 定向包围框 |
+| `mot_ekf_hungarian.py` | ch02 | CV 模型 EKF + 马氏距离门 + 匈牙利关联 + 航迹生命周期管理 |
+| `eskf_gnss_ins_2d.py` | ch03 | 2D ESKF 组合导航，含 GNSS 失锁窗口与零偏估计收敛 |
+| `left_turn_decider.py`、`rss_numeric.py` | ch04 | 无保护左转间隙接受决策；RSS 安全距离数值算例 |
+| `frenet_lattice_planner.py` | ch05 | Frenet 系 Lattice 规划器：横纵采样 + 碰撞剔除 + 代价评分 |
+| `ch06_control_suite.py` | ch06 | 四种横向控制器对比，含车速扫描、延时敏感性、Q/R 权重扫描 |
+| `lss_bev_numpy.py` | ch07 | 纯 numpy 复刻 LSS 视锥 → BEV，含深度 bin 数敏感性扫描 |
+| `arch_latency_sync_bandwidth.py` | ch08 | 端到端时延蒙特卡洛 P50/P95/P99、同步误差、总线带宽估算 |
+
+运行输出保存为同目录下的 `*_out.txt`。
 
 ## 写作规范（保持各章风格统一）
 
@@ -56,15 +75,18 @@
 ```
 autonomous-driving-notes/
 ├── README.md
-└── chapters/
-    ├── ch01-perception.md
-    ├── ch02-sensor-fusion.md
-    ├── ch03-localization-mapping.md
-    ├── ch04-behavior-decision.md
-    ├── ch05-motion-planning.md
-    ├── ch06-vehicle-control.md
-    ├── ch07-end2end.md
-    └── ch08-system-architecture.md
+├── chapters/            # 8 章正文
+│   ├── ch01-perception.md
+│   ├── ch02-sensor-fusion.md
+│   ├── ch03-localization-mapping.md
+│   ├── ch04-behavior-decision.md
+│   ├── ch05-motion-planning.md
+│   ├── ch06-vehicle-control.md
+│   ├── ch07-end2end.md
+│   └── ch08-system-architecture.md
+└── code/                # 各章配套验证脚本 + 真实运行输出
+    ├── *.py
+    └── *_out.txt
 ```
 
 ---

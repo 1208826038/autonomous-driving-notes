@@ -1,5 +1,7 @@
 # 章节拼装用的临时碎片，不入库
 chapters/_*.md
 code/_*.md
+code/*_out.txt
+code/*_err.txt
 __pycache__/
 *.pyc
