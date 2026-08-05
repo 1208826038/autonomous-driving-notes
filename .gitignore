@@ -5,3 +5,4 @@ code/*_out.txt
 code/*_err.txt
 __pycache__/
 *.pyc
+code/*.txt
